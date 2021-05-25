@@ -1,0 +1,105 @@
+# Build CI
+name: Build
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  release:
+    types: [published]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+
+    env:
+      buildDir: "${{ github.workspace }}/build/"
+      # Skip building on CPython 2.7, 3.5 and PyPy wheels on all platforms
+      CIBW_SKIP: pp* cp27-* cp35-*
+
+      # Linux options
+      CIBW_ARCHS_LINUX: auto64
+      CIBW_BEFORE_ALL_LINUX: /project/extern/vcpkg/bootstrap-vcpkg.sh
+      CIBW_ENVIRONMENT_LINUX: "VCPKG_ROOT=/project/extern/vcpkg"
+      CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+
+      # Testing
+      CIBW_TEST_COMMAND: pytest {package}/tests/
+      CIBW_TEST_REQUIRES: pytest
+
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            triplet: x64-windows
+          - os: ubuntu-latest
+            triplet: x64-linux
+          - os: macos-latest
+            triplet: x64-osx
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Install latest CMake
+      - name: Install CMake
+        if: matrix.os != 'ubuntu-latest'
+        uses: lukka/get-cmake@latest
+
+      # Install Python
+      - name: Install Python
+        uses: actions/setup-python@v2
+
+      # Install cibuildwheel
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==1.11.0
+
+      # Install vcpkg
+      - name: Install vcpkg
+        if: matrix.os != 'ubuntu-latest'
+        uses: lukka/run-vcpkg@v7.3
+        with:
+          setupOnly: true
+          vcpkgDirectory: "${{ github.workspace }}/extern/vcpkg"
+          vcpkgTriplet: ${{ matrix.triplet }}
+
+      # Build wheels
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+
+      # Upload wheels
+      - name: Upload wheels
+        uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
+
+  upload_all:
+    name: Upload if release
+    needs: [build_wheels]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+    steps:
+      - uses: actions/setup-python@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@v1.4.2
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}

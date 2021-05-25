@@ -1,0 +1,14 @@
+{
+    "name": "pynuspell",
+    "version": "1.0.0",
+    "dependencies": [
+        {
+            "name": "nuspell",
+            "version>=": "4.2.0"
+        }
+    ],
+    "overrides": [
+        { "name": "nuspell", "version": "4.2.0" }
+    ],
+    "builtin-baseline": "5568f110b509a9fd90711978a7cb76bae75bb092"
+}
