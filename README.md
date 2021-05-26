@@ -1,5 +1,5 @@
-[![PyNuspell](https://img.shields.io/badge/PyNuspell-v1.0.0-green)](https://github.com/scherzocrk/pynuspell)
-[![Nuspell](https://img.shields.io/badge/Nuspell-v4.2.0-green)](https://github.com/nuspell/nuspell)
+[![PyNuspell](https://img.shields.io/badge/PyNuspell-v1.0.0-brightgreen)](https://github.com/scherzocrk/pynuspell)
+[![Nuspell](https://img.shields.io/badge/Nuspell-v4.2.0-brightgreen)](https://github.com/nuspell/nuspell)
 [![Build](https://github.com/scherzocrk/pynuspell/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/scherzocrk/pynuspell/actions/workflows/main.yml)
 [![Python](https://img.shields.io/pypi/pyversions/pynuspell.svg)](https://pypi.org/project/pynuspell/)
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
