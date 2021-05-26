@@ -111,8 +111,7 @@ class CMakeBuild(build_ext):
 setup(
     name="pynuspell",
     version="1.0.0",
-    description="Python bidings for Nuspell - a fast and safe spellchecking"
-    "C++ library",
+    description="Python bindings for Nuspell - a fast and safe spellchecking C++ library",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/scherzocrk/pynuspell",
